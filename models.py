@@ -11,9 +11,6 @@ from keras.layers.merge import Concatenate, add, Add
 from keras import initializers
 from keras import backend as K
 from keras.applications import VGG16, ResNet50, InceptionV3, InceptionResNetV2, MobileNet
-from ann_visualizer.visualize import ann_viz
-
-# from keras.applications.densenet import DenseNet121
 
 
 
@@ -35,8 +32,6 @@ def pretrained_model(config, model='inception'):
 	opt = optimizers.SGD(config.learning_rate)
 	model.compile(optimizer=opt, loss=losses.categorical_crossentropy, metrics=['acc'])
 	return model
-
-
 
 
 def mixed_cnn(config):
@@ -72,63 +67,6 @@ def mixed_cnn(config):
 	return model
 
 
-
-def temporal_model(config):
-	input_shape = (config.dim[0], config.dim[1], 1)
-
-	inp = Input(input_shape, name='input')
-	f1 = Conv2D(16, (3, 32), activation='relu', padding='same')(inp)
-	m1 = MaxPooling2D((2, 2))(f1)
-	b1 = BatchNormalization()(m1)
-	print(K.int_shape(b1))
-
-	f2 = Conv2D(16, (3, 64), activation='relu', padding='same')(inp)
-	m2 = MaxPooling2D((2, 2))(f2)
-	b2 = BatchNormalization()(m2)
-	print(K.int_shape(b2))
-
-	f3 = Conv2D(16, (3, 128), activation='relu', padding='same')(inp)
-	m3 = MaxPooling2D((2, 2))(f3)
-	b3 = BatchNormalization()(m3)
-	print(K.int_shape(b3))
-
-	f4 = Conv2D(16, (8, 3), activation='relu', padding='same')(inp)
-	m4 = MaxPooling2D((2, 2))(f4)
-	b4 = BatchNormalization()(m4)
-	print(K.int_shape(b4))
-
-	f5 = Conv2D(16, (16, 3), activation='relu', padding='same')(inp)
-	m5 = MaxPooling2D((2, 2))(f5)
-	b5 = BatchNormalization()(m5)
-	print(K.int_shape(b5))
-
-	f6 = Conv2D(16, (32, 3), activation='relu', padding='same')(inp)
-	m6 = MaxPooling2D((2, 2))(f6)
-	b6 = BatchNormalization()(m6)
-	print(K.int_shape(b6))
-
-	concat = Concatenate(axis=3)([b1, b2, b3, b4, b5, b6])
-	
-	fcon = Conv2D(64, (5, 5),  activation='relu', padding='valid')(concat)
-	bcon = BatchNormalization()(fcon)
-	print(K.int_shape(bcon))
-
-	gmpool = GlobalMaxPooling2D()(bcon)
-
-	drop = Dropout(0.25)(gmpool)
-	dense1 = Dense(64, activation='relu')(drop)
-	drop1 = Dropout(0.25)(dense1)
-	dense2 = Dense(64, activation='relu')(drop1)
-	drop2 = Dropout(0.25)(dense2)
-	output = Dense(config.n_classes, activation='softmax')(drop2)
-
-	model = models.Model(inputs=inp, outputs=output)
-	opt = optimizers.Adam(config.learning_rate)
-	model.compile(optimizer=opt, loss=losses.categorical_crossentropy, metrics=['acc'])
-
-	return model
-
-
 def mini_domain2(config):
 	input_shape = (config.dim[0], config.dim[1], 1)
 
@@ -137,7 +75,6 @@ def mini_domain2(config):
 	f11 = Conv2D(64, (8, 3), strides=(1, 2), activation='relu', padding='same')(inp)
 	m11 = MaxPooling2D((4, 1), strides=(2, 1))(f11)
 	b11 = BatchNormalization()(m11)
-	print(K.int_shape(b11))
 
 	f12 = Conv2D(128, (8, 1),  strides=(1, 1), activation='relu', padding='same')(b11)
 	m12 = MaxPooling2D((4, 2), strides=(2, 2))(f12) 
@@ -181,6 +118,7 @@ def mini_domain2(config):
 	model.compile(optimizer=opt, loss=losses.categorical_crossentropy, metrics=['acc'])
 
 	return model	
+
 
 def domain_model(config):
 	input_shape = (config.dim[1], config.dim[0], 1)
@@ -293,28 +231,19 @@ def mini_domain(config):
 
 	f1 = Conv2D(48, (8, 7), padding='same', activation='relu', kernel_initializer=initializers.he_uniform())(inp)
 	b1 = BatchNormalization()(f1)
-	print(K.int_shape(b1))
 
 	f2 = Conv2D(32, (32, 7), padding='same', activation='relu', kernel_initializer=initializers.he_uniform())(inp)
 	b2 = BatchNormalization()(f2)
-	print(K.int_shape(b2))
 
 	f3 = Conv2D(16, (64, 7), padding='same', activation='relu', kernel_initializer=initializers.he_uniform())(inp)
 	b3 = BatchNormalization()(f3)
-	print(K.int_shape(b3))
 
 	f4 = Conv2D(16, (90, 7), padding='same', activation='relu', kernel_initializer=initializers.he_uniform())(inp)
 	b4 = BatchNormalization()(f4)
-	print(K.int_shape(b4))
 	concat = Concatenate(axis=3)([b1, b2, b3, b4])
-	print(K.int_shape(concat))
 	pool = MaxPooling2D((5, 5))(concat)
 	
 	fin = Conv2D(120, (2, 2), padding='valid', activation='relu', kernel_initializer=initializers.he_uniform())(pool)
-	print(K.int_shape(fin))
-
-	# pool2 = MaxPooling2D((7, 8))(fin)
-	# print(K.int_shape(pool2))
 
 	flat = GlobalMaxPooling2D()(fin)
 
@@ -325,7 +254,6 @@ def mini_domain(config):
 	dense_drop2 = Dropout(0.2)(dense2)
 
 	output = Dense(config.n_classes, activation='softmax')(dense_drop2) 
-	print(K.int_shape(output))
 
 	model = models.Model(inputs=inp, outputs=output)
 	opt = optimizers.Adam(config.learning_rate)

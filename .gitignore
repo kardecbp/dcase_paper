@@ -1,0 +1,14 @@
+*.h5
+*.rar
+*.csv
+*.txt
+*.log
+*.xls
+*.xlsx
+*.pickle
+*.pyc
+*.log
+*.wav
+!requirements.txt
+!train_inds.pickle
+!val_inds.pickle
