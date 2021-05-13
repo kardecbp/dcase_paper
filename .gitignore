@@ -12,3 +12,7 @@
 !requirements.txt
 !train_inds.pickle
 !val_inds.pickle
+!sample_submission.csv
+!test_post_competition.csv
+!train.csv
+!train_post_competition.csv

@@ -153,16 +153,13 @@ def create_dataset(X, y, config, mode='train', pretrained=False):
 
 	y_fin =  np.array(y_fin)
 	X_fin = np.expand_dims(X_fin, axis=-1)
-	print(X_fin.shape)
-	print(len(true_ids))
-	print(y_fin.shape)
 	
 	return X_fin, y_fin, true_ids
 
 
 def train_val_split(train):	
 	# creating unique train-validation split, which is used for all models
-	# validation data contains only manually varified examples, label distribution of train and validation data is same
+	# validation data contains only manually varified examples, label distribution of train and validation data is the same
 	train_mv, train_nmv = train[train['manually_verified'] == 1], train[train['manually_verified'] == 0]
 	train_nmv_df = pd.DataFrame({'class': train_nmv['label'].value_counts().index, 'count': train_nmv['label'].value_counts().values})
 	train_mv_df = pd.DataFrame({'class': train_mv['label'].value_counts().index, 'count': train_mv['label'].value_counts().values})
